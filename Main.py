@@ -3,6 +3,7 @@ import streamlit as stl
 from streamlit_option_menu import option_menu
 import loginpage
 import overview, final, Quiz, ActualNET, SubjectiveNET
+import Admin
 
 def main():
     stl.set_page_config(page_title="NETPro", page_icon="books", layout= "centered")
@@ -12,7 +13,7 @@ def main():
     loginpage.create_table()
 
 
-
+    
     if 'is_authenticated' not in stl.session_state:
         stl.session_state.is_authenticated = False
 
@@ -25,19 +26,49 @@ def main():
     if not stl.session_state.is_authenticated:
         loginsign = stl.empty()
         with loginsign.container():
-            login_or_signup = stl.radio("Choose an option", ("Login", "Sign Up"))
 
-            if login_or_signup == "Login":
-                #Making a container to delete login stuff after loging in
-                    loginpage.login()
+
+            #inserting admin button
+            admin_col, user_col = stl.columns(2, gap = "small")
+            with admin_col:
+                admin = stl.checkbox("Admin")
+
+            with user_col:
+                user = stl.checkbox("User")
+
+            #if admin chosen move to admin login
+            if admin and not user:
+                stl.write("Hello admin")
+                login_or_signup = stl.radio("Choose an option", ("Login", "Sign Up"))
+
+                if login_or_signup == "Login":
+                    #Making a container to delete login stuff after loging in
+                        loginpage.login()
+                        if stl.session_state.is_authenticated:
+                            Admin.stl.session_state.page = "admin"
+                            loginsign.empty()
+
+                elif login_or_signup == "Sign Up":
+                    loginpage.signup()
                     if stl.session_state.is_authenticated:
                         stl.session_state.page = "main"
-                        loginsign.empty()
 
-            elif login_or_signup == "Sign Up":
-                loginpage.signup()
-                if stl.session_state.is_authenticated:
-                    stl.session_state.page = "main"
+                
+            #If user pressed
+            if user and not admin:
+                login_or_signup = stl.radio("Choose an option", ("Login", "Sign Up"))
+
+                if login_or_signup == "Login":
+                    #Making a container to delete login stuff after loging in
+                        loginpage.login()
+                        if stl.session_state.is_authenticated:
+                            stl.session_state.page = "main"
+                            loginsign.empty()
+
+                elif login_or_signup == "Sign Up":
+                    loginpage.signup()
+                    if stl.session_state.is_authenticated:
+                        stl.session_state.page = "main"
             
     if stl.session_state.page == "main":
         class MultiApp:
@@ -85,7 +116,15 @@ def main():
 
         app = MultiApp()
         app.run()
+    
 
+
+    #The pathway to the admin side
+    if stl.session_state.page == "admin":
+        Admin.app(
+
+
+        )
 if __name__ == "__main__":
     main()
              

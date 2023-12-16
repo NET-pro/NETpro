@@ -13,11 +13,11 @@ def app():
 
 #     stl.write(css, unsafe_allow_html=True)
 
-#     if "conversation" not in stl.session_state:
-#         stl.session_state.conversation = None
+    if "conversation" not in stl.session_state:
+        stl.session_state.conversation = None
 
-#     if "chat-history" not in stl.session_state:
-#         stl.session_state.chat_history = None
+    if "chat-history" not in stl.session_state:
+        stl.session_state.chat_history = None
 
     stl.header("Chat with multiple books :books:")
     user_question = stl.text_input("Ask a question:")
