@@ -4,6 +4,7 @@ from langchain.chains import LLMChain
 from langchain.llms import HuggingFaceHub
 from dotenv import load_dotenv
 
+from Llamacall import llm
 
 def create_quiz_prompt_template():
     template= """
@@ -18,7 +19,7 @@ You generate text based mcqs on your own, and do not give me a python script to 
 """
     prompt = PromptTemplate(
         input_variables= ["num_questions", "context"],
-        template= template
+        template= template 
 
     )
     
@@ -36,10 +37,14 @@ def app():
 
     stl.write("Generate a context based quiz.")
     prompt = create_quiz_prompt_template()
+
     
-    repo_id = "tiiuae/falcon-7b-instruct"
-    llm = HuggingFaceHub(
-        repo_id = repo_id, model_kwargs={})
+    
+
+
+    #repo_id = "tiiuae/falcon-7b-instruct"
+    #llm = HuggingFaceHub(
+       # repo_id = repo_id, model_kwargs={})
     
     chain = create_quiz_chain(prompt, llm)
     context = stl.text_area("Enter the context")

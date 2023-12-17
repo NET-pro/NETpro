@@ -1,8 +1,21 @@
 #The logic for the chunking for AskDoubt, Admin
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import HuggingFaceInstructEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import faiss
+
+from langchain.vectorstores import Pinecone
+import pinecone
+import os
+
+PINECONE_API_KEY = os.environ.get('PINECONE_API_KEY', '0a4755e6-97a9-479e-8761-0f03df76c668')
+PINECONE_API_ENV = os.environ.get('PINECONE_API_ENV','gcp-starter')
+
+pinecone.init(
+	api_key=PINECONE_API_KEY ,
+	environment=PINECONE_API_ENV
+)
+index_name = 'netprop'
 
 
 def get_pdf_text(pdf_docs):
@@ -24,6 +37,6 @@ def get_text_chunks(text):
     return chunks
 
 def get_vectorstore(text_chunks):
-    embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
-    vectorstore= faiss.from_texts(texts=text_chunks, embeddings=embeddings)
+    embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
+    vectorstore= Pinecone.from_texts(texts=text_chunks, embedding = embeddings, index_name = index_name)
     return vectorstore
