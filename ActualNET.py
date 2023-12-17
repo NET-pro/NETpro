@@ -2,16 +2,20 @@ import streamlit as st
 import mysql.connector
 
 # Connect to MySQL database
+
+
 def create_connection():
     conn = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="Lostinsonder4",
+        password="password",
         database="langchain"
     )
     return conn
 
 # Function to initialize the database and insert sample MCQs
+
+
 def initialize_database():
     conn = create_connection()
     cursor = conn.cursor()
@@ -33,8 +37,10 @@ def initialize_database():
     cursor.execute("SELECT COUNT(*) FROM mcqs")
     if cursor.fetchone()[0] == 0:
         sample_mcqs = [
-            ("What is the capital of France?", "Paris", "Berlin", "Madrid", "Rome", "Paris"),
-            ("Which planet is known as the Red Planet?", "Earth", "Mars", "Jupiter", "Saturn", "Mars"),
+            ("What is the capital of France?", "Paris",
+             "Berlin", "Madrid", "Rome", "Paris"),
+            ("Which planet is known as the Red Planet?",
+             "Earth", "Mars", "Jupiter", "Saturn", "Mars"),
             # Add more sample MCQs as needed
         ]
         cursor.executemany("""
@@ -46,14 +52,13 @@ def initialize_database():
     conn.close()
 
 
-def authenticate_user_quiz( password):
-    conn= create_connection()
+def authenticate_user_quiz(password):
+    conn = create_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users WHERE password=%s", (password,))
     user = cursor.fetchone()
     conn.close()
     return user is not None
-
 
 
 # Function to fetch MCQs from the database
@@ -66,6 +71,8 @@ def fetch_mcqs():
     return mcqs
 
 # Streamlit app
+
+
 def app():
     st.title("NET Simulation")
 
@@ -83,19 +90,12 @@ def app():
             # Display MCQs
             for mcq in mcqs:
                 st.write(f"**Q: {mcq['question']}**")
-                options = [mcq['option1'], mcq['option2'], mcq['option3'], mcq['option4']]
+                options = [mcq['option1'], mcq['option2'],
+                           mcq['option3'], mcq['option4']]
                 selected_option = st.radio("Select an option:", options)
-                
+
         elif password == "":
             st.error("Please Enter password")
 
         else:
             st.error("Incorrect password. Please try again")
-
-            
-
-               
-
-            
-
-

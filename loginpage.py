@@ -3,38 +3,43 @@
 import streamlit as stl
 import mysql.connector
 
+
 def create_connection():
-    conn= mysql.connector.connect(
+    conn = mysql.connector.connect(
         host="localhost",
-        username= "root",
-        password= "Lostinsonder4",
-        database= "langchain"
+        username="root",
+        password="password",
+        database="langchain"
     )
     return conn
+
 
 def create_table():
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT)""")
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT)""")
     conn.commit()
     conn.close()
 
+
 def register_user(username, password):
-    conn= create_connection()
+    conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+    cursor.execute(
+        "INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
     conn.commit()
     conn.close()
 
 
 def authenticate_user(username, password):
-    conn= create_connection()
+    conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
+    cursor.execute(
+        "SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
     user = cursor.fetchone()
     conn.close()
     return user is not None
-
 
 
 def login():
@@ -48,9 +53,10 @@ def login():
             stl.success("Login successful!")
             stl.session_state.is_authenticated = True
             stl.session_state.page = "main"
-            
+
         else:
             stl.error("Invalid credentials")
+
 
 def signup():
     stl.header("Sign Up")
