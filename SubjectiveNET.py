@@ -17,7 +17,7 @@ You need to create all the questions relevant to the context, and make sure no q
 Each question has four possible options. 
 At the end of the quiz give all the answers together.
 Only generate {num_questions} number of questions.
-You generate text based mcqs on your own. You have to generate the quiz and only respond with the questions and in the end give their answers, nothing else.
+You generate text based mcqs on your own. You have to generate the quiz and only respond with the questions, their options and in the end give their answers, nothing else.
 """
 
     prompt = PromptTemplate(
