@@ -2,6 +2,7 @@
 # loginpage.py
 import streamlit as stl
 import mysql.connector
+import requests
 
 
 def create_connection():
@@ -14,32 +15,43 @@ def create_connection():
     return conn
 
 
-def create_table():
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT)""")
-    conn.commit()
-    conn.close()
+def register_user(username, password, email):
+    flask_api_url = 'http://localhost:5000/user/register'
+    data = {
+        'username': username,
+        'password': password,
+        'email': email
+    }
+    response = requests.post(flask_api_url, json=data)
 
-
-def register_user(username, password):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
-    conn.commit()
-    conn.close()
+    try:
+        if response.status_code == 200:
+            print("User registered successfully")
+        else:
+            print(f"Error: {response.status_code}, {response.json()}")
+    except requests.RequestException as e:
+        print(f"Error: {e}")
 
 
 def authenticate_user(username, password):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
-    user = cursor.fetchone()
-    conn.close()
-    return user is not None
+    flask_api_url = 'http://localhost:5000/user/login'
+    # Replace with the username and password you want to use for login
+    data = {
+        'username': username,
+        'password': password
+    }
+
+    try:
+        response = requests.post(flask_api_url, json=data)
+
+        if response.status_code == 200:
+            print("Login successful", response.json().get('uuid'))
+            uuid = response.json().get('uuid')
+            stl.session_state.uuid = username
+        else:
+            print(f"Login failed: {response.status_code}, {response.json()}")
+    except requests.RequestException as e:
+        print(f"Error: {e}")
 
 
 def login():
@@ -49,7 +61,7 @@ def login():
     login_button = stl.button("Login")
 
     if login_button:
-        if authenticate_user(username, password):
+        if "Login failed" not in authenticate_user(username, password):
             stl.success("Login successful!")
             stl.session_state.is_authenticated = True
             stl.session_state.page = "main"
@@ -62,8 +74,9 @@ def signup():
     stl.header("Sign Up")
     new_username = stl.text_input("Username")
     new_password = stl.text_input("Password", type="password")
+    email = stl.text_input("Email")
     signup_button = stl.button("Sign Up")
 
-    if signup_button:
-        register_user(new_username, new_password)
+    if signup_button and new_username and new_password and email:
+        register_user(new_username, new_password, email)
         stl.success("Account created! Please log in.")
