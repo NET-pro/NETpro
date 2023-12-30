@@ -38,20 +38,18 @@ def main():
             # if admin chosen move to admin login
             if admin and not user:
                 stl.write("Hello admin")
-                login_or_signup = stl.radio(
-                    "Choose an option", ("Login", "Sign Up"))
+                # login_or_signup = stl.radio(
+                #     "Choose an option", ("Login", "Sign Up"))
 
-                if login_or_signup == "Login":
-                    # Making a container to delete login stuff after loging in
-                    loginpage.login()
-                    if stl.session_state.is_authenticated:
-                        Admin.stl.session_state.page = "admin"
-                        loginsign.empty()
+                Admin.login()
+                if stl.session_state.is_authenticated:
+                    Admin.stl.session_state.page = "admin"
+                    loginsign.empty()
 
-                elif login_or_signup == "Sign Up":
-                    loginpage.signup()
-                    if stl.session_state.is_authenticated:
-                        stl.session_state.page = "main"
+                # elif login_or_signup == "Sign Up":
+                #     Admin.signup()
+                #     if stl.session_state.is_authenticated:
+                #         stl.session_state.page = "main"
 
             # If user pressed
             if user and not admin:

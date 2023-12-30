@@ -1,18 +1,7 @@
 # loginpage.py
 # loginpage.py
 import streamlit as stl
-import mysql.connector
 import requests
-
-
-def create_connection():
-    conn = mysql.connector.connect(
-        host="localhost",
-        username="root",
-        password="password",
-        database="langchain"
-    )
-    return conn
 
 
 def register_user(username, password, email):
@@ -47,9 +36,11 @@ def authenticate_user(username, password):
         if response.status_code == 200:
             print("Login successful", response.json().get('uuid'))
             uuid = response.json().get('uuid')
-            stl.session_state.uuid = username
+            stl.session_state.uuid = uuid
+            return "Login successful"
         else:
             print(f"Login failed: {response.status_code}, {response.json()}")
+            return "Login failed"
     except requests.RequestException as e:
         print(f"Error: {e}")
 
