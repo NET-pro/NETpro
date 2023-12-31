@@ -42,28 +42,30 @@ def submit_quiz(user_responses, subject):
         st.error(f"Error submitting quiz: {str(e)}")
 
 
-mcq_data = fetch_mcqs(5, "Math")
+mcq_list = fetch_mcqs(10, "Math")
 
 
 def app():
 
+    # Initialize answer array
     user_answers = []
 
     # Streamlit app
     st.title("MCQ Quiz Application")
 
     # Iterate through MCQs
-    for i, mcq in enumerate(mcq_data):
+    for i, mcq in enumerate(mcq_list):
         st.header(f"Question {i + 1}")
         st.write(mcq['mcqTitle'])
 
         # Display options
         options = [mcq['opt1'], mcq['opt2'], mcq['opt3'], mcq['opt4']]
-        selected_option = st.radio("Select your answer:", options)
+        selected_option = st.radio("Select your answer:", options, key=str(i))
 
         # Store user's answer
         user_answers.append(str(options.index(selected_option) + 1))
 
-    # Display final answers
-    st.title("User's Answers")
-    st.write(', '.join(user_answers))
+    # Submit button
+    if st.button("Submit"):
+        st.title("Quiz Submitted")
+        st.write("Your Answers:", ', '.join(user_answers))
