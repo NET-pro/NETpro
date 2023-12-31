@@ -1,9 +1,16 @@
 import streamlit as st
 import requests
+st.session_state.started = False
+st.session_state.quizComplete = False
+st.session_state.mcqloop = False
+st.session_state.num = 0
+
+if 'num' not in st.session_state:
+    st.session_state.num = 0
 
 
 def fetch_mcqs(num_mcqs, subject):
-    api_endpoint = "http://localhost:5000/mcq/get_mcqs?num_mcqs=5&subject=Math"
+    api_endpoint = "http://localhost:5000/mcq/get_mcqs"
     params = {"num_mcqs": num_mcqs, "subject": subject}
 
     try:
@@ -13,48 +20,50 @@ def fetch_mcqs(num_mcqs, subject):
             return mcqs
         else:
             st.error(f"Error fetching MCQs: {response.text}")
+            print()
             return None
     except Exception as e:
         st.error(f"Error fetching MCQs: {str(e)}")
+        print("wehru8i9weruifwheruif")
         return None
 
 
+def submit_quiz(user_responses, subject):
+    api_endpoint = "http://localhost:5000/quiz/user_attempted_quiz"
+
+    try:
+        response = requests.post(
+            api_endpoint, json={"user_responses": user_responses, "subject": subject})
+        if response.status_code == 200:
+            st.success("Quiz submitted successfully!")
+        else:
+            st.error(f"Error submitting quiz: {response.text}")
+    except Exception as e:
+        st.error(f"Error submitting quiz: {str(e)}")
+
+
+mcq_data = fetch_mcqs(5, "Math")
+
+
 def app():
-    st.title("NET Simulation")
 
-    # Input for the number of MCQs
-    num_mcqs = st.number_input(
-        "Enter the number of MCQs", min_value=1, value=5)
+    user_answers = []
 
-    # Dropdown for subjects
-    subjects = ["Math", "Chemistry", "Intelligence",
-                "English", "Physics", "Computer", "Biology"]
-    selected_subject = st.selectbox("Select a Subject", subjects)
+    # Streamlit app
+    st.title("MCQ Quiz Application")
 
-    # Fetch MCQs from the backend
-    fetched_mcqs = fetch_mcqs(num_mcqs, selected_subject)
+    # Iterate through MCQs
+    for i, mcq in enumerate(mcq_data):
+        st.header(f"Question {i + 1}")
+        st.write(mcq['mcqTitle'])
 
-    # Display MCQs and collect user responses
-    user_responses = {}
-    if fetched_mcqs:
-        st.subheader(f"Quiz: {selected_subject}")
-        for idx, mcq in enumerate(fetched_mcqs, start=1):
-            st.write(f"{idx}. {mcq['mcqTitle']}")
+        # Display options
+        options = [mcq['opt1'], mcq['opt2'], mcq['opt3'], mcq['opt4']]
+        selected_option = st.radio("Select your answer:", options)
 
-            # Options
-            options = [mcq['opt1'], mcq['opt2'], mcq['opt3'], mcq['opt4']]
-            selected_options = st.checkbox(
-                f"Select options for Question {idx}:", options, key=f"q_{mcq['mcqID']}_{idx}")
+        # Store user's answer
+        user_answers.append(str(options.index(selected_option) + 1))
 
-            # Store user response
-            user_responses[f"q_{mcq['mcqID']}_{idx}"] = selected_options
-
-            st.markdown("---")
-
-        # Button to submit quiz
-        if st.button("Submit Quiz"):
-            # Print user responses
-            st.subheader("User Responses:")
-            for key, selected_options in user_responses.items():
-                if key.startswith("q_"):
-                    st.write(f"{key}: {selected_options}")
+    # Display final answers
+    st.title("User's Answers")
+    st.write(', '.join(user_answers))
