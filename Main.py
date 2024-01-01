@@ -8,6 +8,7 @@ import Quiz
 import ActualNET
 import SubjectiveNET
 import Admin
+import anakytics
 
 
 def main():
@@ -84,7 +85,7 @@ def main():
                     app = option_menu(
                         menu_title='NETPro',
                         options=['Overview', 'ActualNET', 'SubjectiveNET',
-                                 'Dashboard', 'AskDoubt', 'Account'],
+                                 'Dashboard', 'AskDoubt', 'Account', "Analytics"],
                         icons=[':page_with_curl:', 'house_fill', 'ok_hand',
                                'sleuth_or_spy', ':page_with_curl:', ':page_with_curl:'],
                         menu_icon='chat-text-fill',
@@ -107,8 +108,11 @@ def main():
                     ActualNET.app()
                 if app == "SubjectiveNET":
                     SubjectiveNET.app()
+                if app == "Analytics":
+                    anakytics.app()
                 if app == "Account":
                     stl.write("Welcome to the Account Page")
+
                     logout_button = stl.button("Logout")
                     if logout_button:
                         stl.session_state.is_authenticated = False
